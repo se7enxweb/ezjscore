@@ -1,0 +1,19 @@
+{
+    "name": "se7enxweb/ezjscore",
+    "description": "eZ JSCore LS for Exponential: JavaScript and CSS packing, server calls from JavaScript, jQuery 4 and jQuery UI 1.14",
+    "type": "ezpublish-legacy-extension",
+    "keywords": [ "Exponential", "Exponential 6", "legacy extension", "ezjscore", "jQuery", "jQuery 4", "packer", "ajax" ],
+    "homepage": "https://github.com/se7enxweb/ezjscore",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        { "name": "eZ Systems AS", "role": "Original author" },
+        { "name": "7x", "homepage": "https://se7enx.com", "email": "info@se7enx.com", "role": "Maintainer" }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "se7enxweb/ezpublish-legacy-installer": "*"
+    },
+    "extra": {
+        "ezpublish-legacy-extension-name": "ezjscore"
+    }
+}
