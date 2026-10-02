@@ -2,8 +2,8 @@ eZ JSCore LS for Exponential
 ============================
 
 ezjscore is the script and style backbone of Exponential: it packs your
-JavaScript and CSS into single cached files, loads jQuery (and, while it is
-still in use, YUI), and lets JavaScript call PHP functions on the server through
+JavaScript and CSS into single cached files, loads jQuery, and lets JavaScript
+call PHP functions on the server through
 one simple endpoint.
 
 **1.4.0 brings jQuery 4.** `ezjsc::jquery` loads jQuery 4.0.0 together with
@@ -20,7 +20,7 @@ What it gives you
 | | |
 |---|---|
 | **Packing** | `{ezscript_require( array( 'my.js', 'other.js' ) )}` and `{ezcss_require( 'my.css' )}` collect files for the page head; the pagelayout writes them as one packed, minified, cached file each. `ezscript()` / `ezcss()` write them in place, `ezscript_load()` / `ezcss_load()` print what was collected, `ezscriptfiles()` / `ezcssfiles()` list the files |
-| **Libraries** | packer keys `ezjsc::jquery`, `ezjsc::jqueryUI`, `ezjsc::jqueryio`, `ezjsc::yui3`, `ezjsc::yui2`, `ezjsc::yui3io`, local copies or a CDN (`LoadFromCDN`) |
+| **Libraries** | packer keys `ezjsc::jquery`, `ezjsc::jqueryUI`, `ezjsc::jqueryio`, local copies or a CDN (`LoadFromCDN`); YUI and its keys are removed as of 1.5.0 |
 | **Server calls** | PHP functions JavaScript can call through `ezjscore/call/<group>::<function>::<arg>…`, answering JSON, XML or text; groups and permissions in `ezjscore.ini` `[ezjscServer_<group>]`. Ships `ezjsc` (time, search), `ezjscnode` (subtree, load, priorities), `ezjsctemplate` (render a template), `ezpublishingqueue` (asynchronous publishing status), `ezajaxuploader` |
 | **Encoding** | template operators `json_encode`, `xml_encode`, `node_encode` |
 | **Access checks** | `has_access_to_limitation` in templates |
@@ -123,4 +123,4 @@ License
 GNU General Public License v2.0 or later (see `LICENSE`). Copyright eZ Systems
 AS, and [7x](https://se7enx.com) for the Exponential versions. The bundled
 libraries keep their own licences: jQuery, jQuery Migrate and jQuery UI (MIT,
-`LICENSE-jquery*.txt`), YUI (BSD).
+`LICENSE-jquery*.txt`).
