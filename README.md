@@ -25,6 +25,30 @@ What it gives you
 | **Encoding** | template operators `json_encode`, `xml_encode`, `node_encode` |
 | **Access checks** | `has_access_to_limitation` in templates |
 
+What is new in 1.6.0
+--------------------
+
+- **Server functions can require their policy.** A server function group in
+  `ezjscore.ini` takes `RequirePolicy`: not set, `Functions[]` is checked as
+  before; `disabled`, it is not checked; `enabled`, it is checked and a request
+  whose calls are all refused gets `403 Forbidden`. `ezjscnode` ships with
+  `RequirePolicy=disabled`, so an existing site behaves as before until it
+  switches it on.
+- **Search results sorted by your setting.** `ezjsc::search` sorts eZ Find
+  results by `ezfind.ini [SearchSettings] SortBy[]`; the shipped
+  `settings/ezfind.ini.append.php` keeps the newest first, as before.
+- **Safer uploads.** The ajax uploader checks an uploaded image by its content
+  before it is stored, and asks for an alternative text when the image's class
+  requires one. These two use image checks of the Exponential 6.0.15 kernel.
+- A PHP Error in a server function gives a clean JSON error instead of a broken
+  response, and the output of `htmlspecialchars()` is the same on PHP 8.0 to 8.5.
+
+The policy, search sorting and upload checks are rebuilt from features of
+LoveStack, Mugo Web's distribution of the legacy kernel
+([mugoweb/ezpublish-legacy](https://github.com/mugoweb/ezpublish-legacy)),
+with many thanks to Mugo Web. The commits each part comes from are listed in
+`CHANGELOG`.
+
 What is new in 1.4.0
 --------------------
 
@@ -54,7 +78,7 @@ kernel, in `extension/ezjscore`.
 **As a package** (into an installation's `extension/` directory):
 
 ```sh
-composer require se7enxweb/ezjscore:^1.4
+composer require se7enxweb/ezjscore:^1.6
 ```
 
 If your Composer does not find the package, add this repository to your
@@ -121,6 +145,7 @@ License
 -------
 
 GNU General Public License v2.0 or later (see `LICENSE`). Copyright eZ Systems
-AS, and [7x](https://se7enx.com) for the Exponential versions. The bundled
+AS, and [7x](https://se7enx.com) for the Exponential versions; portions derived
+from LoveStack (mugoweb/ezpublish-legacy), Copyright (C) Mugo Web, GPL v2. The bundled
 libraries keep their own licences: jQuery, jQuery Migrate and jQuery UI (MIT,
 `LICENSE-jquery*.txt`).

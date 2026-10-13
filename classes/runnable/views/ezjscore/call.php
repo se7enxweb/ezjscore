@@ -28,6 +28,8 @@
  *   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *   MA 02110-1301, USA.
  *
+ * Portions derived from LoveStack (mugoweb/ezpublish-legacy, commit aa307a7ff3), Copyright (C) Mugo Web, GPL v2
+ *
  *
  * ## END COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
  *
@@ -52,9 +54,22 @@ function multipleezjscServerCalls( $calls, $contentType = 'json' )
             {
                 $response['content'] =  $call->call();
             }
-            catch ( Exception $e )
+            // Catch Throwable, not Exception: a PHP Error escaping here turns
+            // the JSON body into an HTML fatal page, which the client only sees
+            // as an "Unexpected token" SyntaxError.
+            catch ( Throwable $e )
             {
-                $response['error_text'] = $e->getMessage();
+                if ( $e instanceof Exception )
+                {
+                    $response['error_text'] = $e->getMessage();
+                }
+                else
+                {
+                    // A PHP Error is a bug, not a message for the client: its
+                    // text can carry server file paths. Log it, send a generic text.
+                    eZDebug::writeError( get_class( $e ) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), 'ezjscore/call' );
+                    $response['error_text'] = 'Internal error in the server function';
+                }
             }
         }
         else
@@ -147,10 +162,25 @@ class Call extends \Exponential\Runnable\ModuleView
 
 
         // prepare calls
+        $refusals = array();
         foreach( $callList as $call )
         {
-            $temp = \ezjscServerRouter::getInstance( explode( '::', $call ), true, true );
+            $refusal = null;
+            $temp = \ezjscServerRouter::getInstance( explode( '::', $call ), true, true, $refusal );
             $callFnList[] = $temp === null ? $call : $temp;
+            $refusals[] = $refusal;
+        }
+
+        // every call refused by a server function with RequirePolicy=enabled: 403, as the policy
+        // system answers elsewhere (other refusals keep the error text in a 200 answer)
+        // (method_exists: a Velocity worker started before refusedStatus() was added keeps 200)
+        if ( method_exists( '\ezjscServerRouter', 'refusedStatus' ) && \ezjscServerRouter::refusedStatus( $refusals ) === 403 )
+        {
+            header( $_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden' );
+            $response = array( 'error_text' => 'Access denied', 'content' => '' );
+            echo \ezjscAjaxContent::autoEncode( $response, $contentType );
+            \eZExecution::cleanExit();
+            return $this->viewResult( isset( $Result ) ? $Result : null, null );
         }
 
         $callFnListCount = count( $callFnList ) -1;
