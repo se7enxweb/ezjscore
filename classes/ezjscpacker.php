@@ -89,10 +89,7 @@ class ezjscPacker
         foreach ( $packedFiles as $packedFile )
         {
             // Is this a js file or js content?
-            if ( isset( $packedFile[4] ) &&
-               ( strpos( $packedFile, 'http://' ) === 0 ||
-                 strpos( $packedFile, 'https://' ) === 0 ||
-                 strripos( $packedFile, '.js' ) === ( strlen( $packedFile ) -3 ) ) )
+            if ( self::isFileURL( $packedFile, '.js' ) )
             {
                 if ( $useFullUrl )
                 {
@@ -129,10 +126,7 @@ class ezjscPacker
         foreach ( $packedFiles as $packedFile )
         {
             // Is this a css file or css content?
-            if ( isset( $packedFile[5] ) &&
-               ( strpos( $packedFile, 'http://' ) === 0 ||
-                 strpos( $packedFile, 'https://' ) === 0 ||
-                 strripos( $packedFile, '.css' ) === ( strlen( $packedFile ) -4 ) ) )
+            if ( self::isFileURL( $packedFile, '.css' ) )
             {
                 if ( $useFullUrl )
                 {
@@ -146,6 +140,23 @@ class ezjscPacker
             }
         }
         return $ret;
+    }
+
+    /**
+     * Whether an entry of packFiles() is the URL of a file (an http(s) URL, or a path ending in $extension) rather
+     * than generated content to write inline.
+     *
+     * @param string $entry
+     * @param string $extension '.js' or '.css'
+     * @return bool
+     */
+    static function isFileURL( $entry, $extension )
+    {
+        if ( !is_string( $entry ) || !isset( $entry[strlen( $extension ) + 1] ) )
+            return false;
+        if ( strpos( $entry, 'http://' ) === 0 || strpos( $entry, 'https://' ) === 0 )
+            return true;
+        return (bool) preg_match( '/' . preg_quote( $extension, '/' ) . '$/i', $entry );
     }
 
     /**
@@ -380,6 +391,8 @@ class ezjscPacker
             // Calculate last modified time and store in arrays
             $data['last_modified'] = max( $data['last_modified'], $fileTime );
             $data['locale'][]      = $file;
+            // The unpacked URL (packing off, as with DevelopmentMode) is the file's own address, never with a version
+            // query (owner rule: no version query on script and stylesheet links; an old copy is reloaded by hand)
             $data['www'][]         = $wwwFile;
             $data['cache_name']   .= $file . '_';
         }
